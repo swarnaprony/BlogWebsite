@@ -31,6 +31,16 @@ app.get("/contact", function(req, res) {
   res.render("contact", {contactContentPara: contactContent});
 });
 
+app.get("/compose", function(req, res) {
+  res.render("compose");
+});
+
+app.post('/compose',function(req,res){
+  var composed = req.body.newText;
+  console.log(composed);
+});
+
+
 app.listen(8000, function() {
   console.log("Server started on port 8000");
 });
