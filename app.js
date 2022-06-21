@@ -23,6 +23,18 @@ app.get("/", function(req, res) {
    res.render("home", {homeStarting: homeStartingContent});
 });
 
+app.get("/home", function(req, res) {
+  res.render("home", {homeStarting: homeStartingContent});
+});
+
+app.get("/about", function(req, res) {
+  res.render("about", {aboutContentPara: aboutContent});
+});
+
+app.get("/contact", function(req, res) {
+  res.render("contact", {contactContentPara: contactContent});
+});
+
 app.listen(8000, function() {
   console.log("Server started on port 8000");
 });
