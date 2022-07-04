@@ -1,6 +1,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const req = require('express/lib/request');
 const ejs = require("ejs");
 // Load the full build.
@@ -12,66 +13,71 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 
 const app = express();
 
-const posts = [];
-const titleItems =[];
-
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+mongoose.connect("mongodb+srv://admin-swarna:eENsnPzypRAZ0OlT@cluster0.alvs2jv.mongodb.net/postsDB");
 
-
-
-
-app.get("/", function(req, res) {
-   res.render("home", {homeStarting: homeStartingContent, posts: posts});
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
 });
 
-app.get("/about", function(req, res) {
-  res.render("about", {aboutContentPara: aboutContent});
+const Post = mongoose.model("Post", postSchema);
+
+
+
+app.get("/", function (req, res) {
+  Post.find({}, function (err, postItem) {
+    res.render("home", { homeStarting: homeStartingContent, posts: postItem });
+  })
+
 });
 
-app.get("/contact", function(req, res) {
-  res.render("contact", {contactContentPara: contactContent});
+app.get("/about", function (req, res) {
+  res.render("about", { aboutContentPara: aboutContent });
 });
 
-app.get("/compose", function(req, res) {
+app.get("/contact", function (req, res) {
+  res.render("contact", { contactContentPara: contactContent });
+});
+
+app.get("/compose", function (req, res) {
   res.render("compose");
 });
 
 
-app.get("/post/:title", (req, res) => {
+app.get("/posts/:title", (req, res) => {
   const requstedTitle = req.params.title;
 
-  posts.forEach(function(post) {
-    const storedTitle = post.title;
-
-    if (_.lowerCase(storedTitle) === _.lowerCase(requstedTitle)) {
-      res.render("post", {
-        title: post.title,
-        content: post.content
-      });
-    }
+  Post.find({ title: requstedTitle }, function (err, postItem) {
+    console.log(postItem);
+    res.render("post", {
+      title: postItem[0].title,
+      content: postItem[0].content
+    });
+    
   });
- 
+  
+
 });
 
 
-app.post('/compose',function(req,res){
-  const titleItem = req.body.postTitle;
-  const contentItem = req.body.postBody;
+app.post('/compose', function (req, res) {
+  const postTitle = req.body.postTitle;
+  const postContent = req.body.postBody;
+  const post = new Post({
+    title: postTitle,
+    content: postContent
+  });
 
-  const post = {title: titleItem, 
-                content: contentItem};
-  
-  posts.push(post);
-  titleItems.push(titleItem);
-
+  post.save();
   res.redirect("/");
 });
 
 
-app.listen(3000, function() {
+app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
