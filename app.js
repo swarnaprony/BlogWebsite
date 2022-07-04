@@ -27,8 +27,6 @@ const postSchema = new mongoose.Schema({
 
 const Post = mongoose.model("Post", postSchema);
 
-
-
 app.get("/", function (req, res) {
   Post.find({}, function (err, postItem) {
     res.render("home", { homeStarting: homeStartingContent, posts: postItem });
@@ -63,7 +61,6 @@ app.get("/posts/:title", (req, res) => {
   
 
 });
-
 
 app.post('/compose', function (req, res) {
   const postTitle = req.body.postTitle;
